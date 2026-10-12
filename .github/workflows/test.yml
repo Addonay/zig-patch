@@ -1,0 +1,31 @@
+name: Test
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+          - os: windows-11-arm
+            # zig build is broken on aarch64-windows in zig 0.16.0
+            skip_zig16: true
+          - os: macos-latest
+          - os: ubuntu-latest
+      fail-fast: false
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: marler8997/setup-anyzig@master
+      - if: ${{ !matrix.skip_zig16 }}
+        run: zig 0.16.0 build test --summary all
+      - if: ${{ !matrix.skip_zig16 }}
+        run: zig 0.16.0 build test --summary all
+        working-directory: test
+      - run: zig 0.17.0 build test --summary all
+      - run: zig 0.17.0 build test --summary all
+        working-directory: test

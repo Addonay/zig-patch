@@ -1,0 +1,9 @@
+Adds a declaration next to std-decl.patch's, so it only applies on top of it.
+
+diff --git a/std.zig b/std.zig
+--- a/std.zig
++++ b/std.zig
+@@ -1,2 +1,3 @@
+ pub const patch_test_decl = true;
++pub const patch_stack_decl = true;
+ pub const PriorityQueue = @import("priority_queue.zig").PriorityQueue;

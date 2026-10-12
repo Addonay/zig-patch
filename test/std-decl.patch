@@ -1,0 +1,9 @@
+Adds a declaration to std.zig.
+
+diff --git a/std.zig b/std.zig
+--- a/std.zig
++++ b/std.zig
+@@ -1,2 +1,3 @@
+ pub const MultiArrayList = @import("multi_array_list.zig").MultiArrayList;
++pub const patch_test_decl = true;
+ pub const PriorityQueue = @import("priority_queue.zig").PriorityQueue;

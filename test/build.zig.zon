@@ -1,0 +1,10 @@
+.{
+    .name = .patch_test,
+    .fingerprint = 0x6b40c526c913972c,
+    .version = "0.0.0",
+    .minimum_zig_version = "0.16.0",
+    .dependencies = .{
+        .patch = .{ .path = ".." },
+    },
+    .paths = .{""},
+}

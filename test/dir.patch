@@ -1,0 +1,29 @@
+Patches test/dir so main.zig exits 0: a modify, a copy and a rename, from `git diff -M -C`.
+
+diff --git a/value.zig b/copied.zig
+similarity index 100%
+copy from value.zig
+copy to copied.zig
+diff --git a/main.zig b/main.zig
+index a0a6094..48de156 100644
+--- a/main.zig
++++ b/main.zig
+@@ -1,3 +1,6 @@
+ pub fn main() u8 {
+-    return 1;
++    // value.zig patched, copied.zig copied from the original, other.zig renamed
++    const value = @import("value.zig").value;
++    const copied = @import("copied.zig").value;
++    return if (value == 0 and copied == 1 and @import("renamed.zig").ok) 0 else 1;
+ }
+diff --git a/other.zig b/renamed.zig
+similarity index 100%
+rename from other.zig
+rename to renamed.zig
+diff --git a/value.zig b/value.zig
+index 70e1f9d..b2dcbbc 100644
+--- a/value.zig
++++ b/value.zig
+@@ -1 +1 @@
+-pub const value = 1;
++pub const value = 0;

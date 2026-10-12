@@ -1,0 +1,8 @@
+A patch whose hunk isn't in misuse/dir/x.txt.
+
+diff --git a/x.txt b/x.txt
+--- a/x.txt
++++ b/x.txt
+@@ -1 +1 @@
+-not there
++b
