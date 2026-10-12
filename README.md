@@ -17,15 +17,26 @@ const patched_dir = b.dependency("patch", .{
 
 ## Patching std
 
+std is a directory too, patch it and import the result as `std`:
+
 ```zig
-const patched_std = b.dependency("patch", .{
-    .std_patches = &[_]std.Build.LazyPath{
-        b.path("my-std.patch"),
-    },
-}).module("std");
+const patched_std = b.createModule(.{
+    .root_source_file = b.dependency("patch", .{
+        .source = b.graph.path(.zig_lib, "std"),
+        .patches = &[_]std.Build.LazyPath{
+            b.path("my-std.patch"),
+        },
+    }).namedLazyPath("patched").path(b, "std.zig"),
+});
 
 // in a root module's .imports (or root_module.addImport):
 .imports = &.{.{ .name = "std", .module = patched_std }},
+```
+
+On zig 0.16.0, which lacks `b.graph.path`, the source is:
+
+```zig
+.source = std.Build.LazyPath{ .cwd_relative = b.graph.zig_lib_directory.join(b.allocator, &.{"std"}) catch @panic("OOM") },
 ```
 
 > Note that replacing std in the root module automatically replaces it for every module in the compilation.

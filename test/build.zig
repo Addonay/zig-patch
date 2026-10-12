@@ -40,7 +40,12 @@ pub fn build(b: *std.Build) void {
                 .target = target,
                 .optimize = optimize,
                 .imports = &.{
-                    .{ .name = "std", .module = b.dependency("patch", .{ .std_patches = case[1] }).module("std") },
+                    .{ .name = "std", .module = b.createModule(.{
+                        .root_source_file = b.dependency("patch", .{
+                            .source = zigStdDir(b),
+                            .patches = case[1],
+                        }).namedLazyPath("patched").path(b, "std.zig"),
+                    }) },
                     .{ .name = "sub", .module = sub },
                     .{ .name = "options", .module = options.createModule() },
                 },
@@ -50,12 +55,10 @@ pub fn build(b: *std.Build) void {
 
     // misuses fail with a clear error, see misuse/build.zig
     for ([_]struct { []const u8, []const u8 }{
-        .{ "std_without_std_patches", "module(\"std\") needs the std_patches option" },
         .{ "patched_without_options", "namedLazyPath(\"patched\") needs the source and patches options" },
         .{ "source_without_patches", "the source option needs the patches option" },
         .{ "patches_without_source", "the patches option needs the source option" },
         .{ "empty_patches", "the patches option is empty" },
-        .{ "empty_std_patches", "the std_patches option is empty" },
         // errors name the patch line
         .{ "bad_patch", "bad.patch:6: patching 'x.txt' failed with HunkNotFound" },
     }) |case| {
@@ -69,5 +72,13 @@ pub fn build(b: *std.Build) void {
         test_step.dependOn(&run.step);
     }
 }
+
+/// The zig lib's std directory, see "Patching std" in ../README.md.
+fn zigStdDir(b: *std.Build) std.Build.LazyPath {
+    if (zig_16) return .{ .cwd_relative = b.graph.zig_lib_directory.join(b.allocator, &.{"std"}) catch @panic("OOM") };
+    return b.graph.path(.zig_lib, "std");
+}
+
+const zig_16 = @import("builtin").zig_version.order(.{ .major = 0, .minor = 17, .patch = 0 }) == .lt;
 
 const std = @import("std");
