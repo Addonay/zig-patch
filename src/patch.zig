@@ -294,10 +294,10 @@ fn applyHunks(arena: std.mem.Allocator, content: []const u8, hunks: *HunkIterato
     var out: std.ArrayList(u8) = try .initCapacity(arena, content.len + hunks.body.len);
     var pos: usize = 0;
     while (true) {
-        const hunk = hunks.next() catch |err| {
+        const hunk = (hunks.next() catch |err| {
             line.* = hunks.line;
             return err;
-        } orelse break;
+        }) orelse break;
         line.* = hunk.line;
         const at = try findHunk(content, hunk);
         if (at < pos) return error.HunkOutOfOrder;
